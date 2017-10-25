@@ -1,0 +1,17 @@
+# vyos basic_ebgp Playbook
+# For interface build the "tasks" variables require:
+# task1: l3_interface
+# task2: basic_ebgp
+# To push just a peering:
+# task1: basic_ebgp
+# #task2: <empty or commented (undefined)>
+basic_ebgp:
+  - {
+bgp_local_as: 65000,
+ebgp_group_name: EBGP_TEST_GROUP,
+ebgp_peer_description: "EBGP_TEST_PEERS_VIA-{{ vyos_l3_interface_name }}",
+ebgp_peer_asn: 65161,
+ebgp_peering_ip: 172.16.1.1,
+ebgp_peering_passwd: "Go!Figur3",
+ebgp_initial_passive: enabled
+}

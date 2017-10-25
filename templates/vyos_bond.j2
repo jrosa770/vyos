@@ -1,0 +1,23 @@
+# Created by Ansible for {{ inventory_hostname }} on {{ ansible_date_time.date }}
+#
+{% if item.vyos_bond_conf == "add" %}
+set interfaces bonding {{item.vyos_bond_name}} 
+set interfaces bonding {{item.vyos_bond_name}} description {{item.vyos_bond_description}}
+set interfaces bonding {{item.vyos_bond_name}} hash-policy layer2
+set interfaces bonding {{item.vyos_bond_name}} mode 802.3ad
+{% endif %}
+{% if item.vyos_bond_if1 is defined and item.vyos_bond_conf == "add" or item.vyos_bond_conf == "change" %}
+set interfaces ethernet {{item.vyos_bond_if1}} bond-group {{item.vyos_bond_name}}
+set interfaces bonding {{item.vyos_bond_name}} description {{item.vyos_bond_description}}:{{ item.vyos_bond_if1 }}
+{% endif %}
+{% if item.vyos_bond_if2 is defined and item.vyos_bond_conf == "add" or item.vyos_bond_conf == "change" %}
+set interfaces ethernet {{item.vyos_bond_if2}} bond-group {{item.vyos_bond_name}}
+set interfaces bonding {{item.vyos_bond_name}} description {{item.vyos_bond_description}}:{{ item.vyos_bond_if1 }}:{{item.vyos_bond_if2}}
+{% endif %}
+{% if item.vyos_bond_conf == "delete" %}
+delete interfaces ethernet {{item.vyos_bond_if1}} bond-group {{item.vyos_bond_name}}
+delete interfaces ethernet {{item.vyos_bond_if2}} bond-group {{item.vyos_bond_name}}
+delete interfaces bonding {{item.vyos_bond_name}}
+{% endif %}
+commit comment "Created by Ansible for {{ inventory_hostname }} to add {{item.vyos_bond_name}} Timestamp: {{ ansible_date_time.iso8601 }}"
+save

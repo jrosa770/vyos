@@ -1,0 +1,59 @@
+- name: Backup Current Configuration for {{ inventory_hostname }} {{ ansible_date_time.iso8601 }}
+  vyos_config:
+    backup: yes
+    provider: "{{ creds }}"
+#
+# TASK provided by vyos_config_l3_interface
+#- name: configure interface {{ vyos_interface_name }}
+#  vyos_interface:
+#    name: "{{ vyos_interface_name }}"
+#    description: "{{ vyos_interface_desc }}"
+#    state: "{{ vyos_interface_state }}"
+#    enabled: "{{ vyos_interface_enabled }}"
+#    provider: "{{ creds }}"
+#
+#- name: configure interface {{ vyos_l3_interface_name }} with IP - {{ vyos_l3_interface_ipv4 }}
+#  vyos_l3_interface:
+#    name: "{{ vyos_l3_interface_name }}"
+#    ipv4: "{{ vyos_l3_interface_ipv4 }}"
+#    provider: "{{ creds }}"
+#  when: (vyos_l3_interface_agg == 'disabled' and vyos_l3_interface_build == 'enabled' and vyos_l3_dual_stack == 'disabled')
+#
+#- name: configure interface {{ vyos_l3_interface_name }} with IP - {{ vyos_l3_interface_ipv4 }} and {{ vyos_l3_interface_ipv6 }}
+#  vyos_l3_interface:
+#    name: "{{ vyos_l3_interface_name }}"
+#    ipv4: "{{ vyos_l3_interface_ipv4 }}"
+#    ipv6: "{{ vyos_l3_interface_ipv6 }}"
+#    provider: "{{ creds }}"
+#  when: (vyos_l3_interface_agg == 'disabled' and vyos_l3_interface_build == 'enabled' and vyos_l3_dual_stack == 'enabled')
+
+- name: Configuration Information
+  debug: msg="name - {{ vyos_l3_interface_name}} | description - {{ vyos_l3_interface_desc }} | IP - {{ vyos_l3_interface_ipv4 }}"
+
+- name: Archive older configs
+  shell: /bin/cp config_partial/basic_ebgp/ebgp-{{ inventory_hostname }}.cfg archive/ebgp-{{ inventory_hostname }}-{{ ansible_date_time.iso8601 }}.cfg
+
+- name: Remove older configs
+  shell: /bin/rm config_partial/basic_ebgp/ebgp-{{ inventory_hostname }}.cfg
+
+- name: Generate Basic eBGP Configuration File
+  template: src=templates/basic_ebgp.j2 dest=config_partial/basic_ebgp/ebgp-{{ inventory_hostname }}.cfg
+  with_items: "{{ basic_ebgp }}"
+
+- name: Merge configuration via napalm_install_config
+  napalm_install_config:
+    hostname: "{{ inventory_hostname }}"
+    config_file: config_partial/vyos_user/vyos_user-{{ inventory_hostname }}.cfg
+    dev_os: vyos
+    get_diffs: False
+    commit_changes: True
+    provider: "{{ creds }}"
+
+- name: Commit and save changes
+  vyos_config:
+    save: yes
+    comment: "{{ task_comment }}"
+    provider: "{{ creds }}"
+
+- name: Commit Message
+  debug: msg="{{ task_comment }}"

@@ -1,0 +1,21 @@
+# vyos static route Playbook
+# If vyos_interface_build = enabled, the interface playbook will configure static route
+# If vyos_interface_build = disabled, the playbook will just clear the ip route
+vyos_static_route_build: enabled
+#
+# Delete the existing static configuration to the same destination before configuration option
+vyos_static_route_w_clear: enabled
+#
+# If Default ***(Use with Care)***
+vyos_static_default: disabled
+# Specific prefix (destination)
+vyos_static_route_dest: 192.168.0.0/25
+# Next Hop for specific or default 
+vyos_static_route_nxt_hop: 172.16.1.1
+# Set Command:
+set_syntax_static: 
+  - "set protocols static route {{ vyos_static_route_dest }} next-hop {{ vyos_static_route_nxt_hop }} <distance> <1-255>"
+  - "set protocols static route {{ vyos_static_route_dest }} next-hop {{ vyos_static_route_nxt_hop }} <blackhole>"
+# Option for vyos_l3_interface aggregate
+# Playbook will call vars/task_vars/vy_static_aggregate.yml for information
+vyos_static_route_agg: disabled

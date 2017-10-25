@@ -1,0 +1,2 @@
+# Banner Playbook
+vyos_banner_text: "{{ lookup('file', './config_partial/pre-login_banner.cfg') }}"

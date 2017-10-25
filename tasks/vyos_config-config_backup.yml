@@ -1,0 +1,13 @@
+- name: Backup Current Configuration for {{ inventory_hostname }} {{ ansible_date_time.iso8601 }}
+  vyos_config:
+    backup: yes
+    provider: "{{ creds }}"
+
+- name: Commit and save changes for "{{ inventory_hostname }}" Timestamp - "{{ ansible_date_time.iso8601 }}"
+  vyos_config:
+    save: yes
+    comment: "{{ task_comment }}"
+    provider: "{{ creds }}"
+
+- name: Commit Message
+  debug: msg="{{ task_comment }}"

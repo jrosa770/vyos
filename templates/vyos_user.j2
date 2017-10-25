@@ -1,0 +1,35 @@
+# Created by Ansible for {{ inventory_hostname }} on {{ ansible_date_time.date }}
+#
+{% if item.vyos_user_conf == "add" %}
+set system login user {{item.vyos_user_name}}
+set system login user {{item.vyos_user_name}} level {{item.vyos_user_level}}
+{% endif %}
+{% if item.vyos_user_auth_type == "key" and item.vyos_user_conf == "add" %}
+set system login user {{item.vyos_user_name}} authentication public-keys "{{item.vyos_user_ssh_key_user_id}}"
+set system login user {{item.vyos_user_name}} authentication public-keys "{{item.vyos_user_ssh_key_user_id}}" key "{{item.vyos_user_ssh_key_content}}"
+set system login user {{item.vyos_user_name}} authentication public-keys "{{item.vyos_user_ssh_key_user_id}}" type ssh-rsa
+commit
+delete system login user {{item.vyos_user_name}} authentication plaintext-password
+delete system login user {{item.vyos_user_name}} authentication encrypted-password
+{% endif %}
+{% if item.vyos_user_auth_type == "key" and item.vyos_user_conf == "change" %}
+delete system login user {{item.vyos_user_name}} authentication
+set system login user {{item.vyos_user_name}} authentication public-keys "{{item.vyos_user_ssh_key_user_id}}"
+set system login user {{item.vyos_user_name}} authentication public-keys "{{item.vyos_user_ssh_key_user_id}}" key "{{item.vyos_user_ssh_key_content}}"
+set system login user {{item.vyos_user_name}} authentication public-keys "{{item.vyos_user_ssh_key_user_id}}" type ssh-rsa
+commit
+delete system login user {{item.vyos_user_name}} authentication plaintext-password
+delete system login user {{item.vyos_user_name}} authentication encrypted-password
+{% endif %}
+{% if item.vyos_user_auth_type == "password" and item.vyos_user_conf == "add" %}
+set system login user {{item.vyos_user_name}} plaintext-password {{item.vyos_user_password}}
+{% endif %}
+{% if item.vyos_user_auth_type == "password" and item.vyos_user_conf == "change" %}
+delete system login user {{item.vyos_user_name}} authentication
+set system login user {{item.vyos_user_name}} plaintext-password {{item.vyos_user_password}}
+{% endif %}
+{% if item.vyos_user_conf == "delete" %}
+delete system login user {{item.vyos_user_name}}
+{% endif %}
+commit comment "Created by Ansible for {{ inventory_hostname }} to {{item.vyos_user_conf}} {{item.vyos_user_name}} Timestamp: {{ ansible_date_time.iso8601 }}"
+save

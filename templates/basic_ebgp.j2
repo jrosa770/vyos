@@ -1,0 +1,15 @@
+# Created by Ansible for {{ inventory_hostname }} on {{ ansible_date_time.date }}
+#
+set protocols bgp {{item.bgp_local_as}} peer-group {{item.ebgp_group_name}}
+set protocols bgp {{item.bgp_local_as}} peer-group {{item.ebgp_group_name}} description {{item.ebgp_peer_description}}_AS_{{item.ebgp_peer_asn}}
+set protocols bgp {{item.bgp_local_as}} peer-group {{item.ebgp_group_name}} remote-as {{item.ebgp_peer_asn}}
+set protocols bgp {{item.bgp_local_as}} peer-group {{item.ebgp_group_name}} soft-reconfiguration inbound
+set protocols bgp {{item.bgp_local_as}} neighbor {{item.ebgp_peering_ip}} peer-group {{item.ebgp_group_name}}
+{% if item.ebgp_peering_passwd is defined %}
+set protocols bgp {{item.bgp_local_as}} neighbor {{item.ebgp_peering_ip}} password {{item.ebgp_peering_passwd}}
+{% endif %}
+{% if item.ebgp_initial_passive == "enabled" %}
+set protocols bgp {{item.bgp_local_as}} neighbor {{item.ebgp_peering_ip}} passive
+{% endif %}
+commit comment "Created by Ansible for {{ inventory_hostname }} to add eBGP {{ item.ebgp_peer_description }} ASN: {{item.ebgp_peer_asn}} Timestamp: {{ ansible_date_time.iso8601 }}"
+save

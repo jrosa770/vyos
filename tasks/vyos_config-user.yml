@@ -1,0 +1,32 @@
+- name: Backup Current Configuration for {{ inventory_hostname }} {{ ansible_date_time.iso8601 }}
+  vyos_config:
+    backup: yes
+    provider: "{{ creds }}"
+
+- name: Archive older configs
+  shell: /bin/cp config_partial/vyos_user/vyos_user-{{ inventory_hostname }}.cfg archive/vyos_user-{{ inventory_hostname }}-{{ ansible_date_time.iso8601 }}.cfg
+
+- name: Remove older configs
+  shell: /bin/rm config_partial/vyos_user/vyos_user-{{ inventory_hostname }}.cfg
+
+- name: Generate the VyOs User Configuration File
+  template: src=templates/vyos_user.j2 dest=config_partial/vyos_user/vyos_user-{{ inventory_hostname }}.cfg
+  with_items: "{{ vyos_user }}"
+
+- name: Merge configuration via napalm_install_config
+  napalm_install_config:
+    hostname: "{{ inventory_hostname }}"
+    config_file: config_partial/vyos_user/vyos_user-{{ inventory_hostname }}.cfg
+    dev_os: vyos
+    get_diffs: False
+    commit_changes: True
+    provider: "{{ creds }}"
+
+- name: Commit and save changes
+  vyos_config:
+    save: yes
+    comment: "{{ task_comment }}"
+    provider: "{{ creds }}"
+
+- name: Commit Message
+  debug: msg="{{ task_comment }}"

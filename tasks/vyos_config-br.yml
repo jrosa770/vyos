@@ -1,0 +1,31 @@
+- name: Backup Current Configuration for {{ inventory_hostname }} {{ ansible_date_time.iso8601 }}
+  vyos_config:
+    backup: yes
+    provider: "{{ creds }}"
+
+- name: Archive older configs
+  shell: /bin/cp config_partial/vyos_br/vyos_br-{{ inventory_hostname }}.cfg archive/vyos_br-{{ inventory_hostname }}-{{ ansible_date_time.iso8601 }}.cfg
+
+- name: Remove older configs
+  shell: /bin/rm config_partial/vyos_br/vyos_br-{{ inventory_hostname }}.cfg
+
+- name: Generate the VyOs bridge Configuration File
+  template: src=templates/vyos_br.j2 dest=config_partial/vyos_br/vyos_br-{{ inventory_hostname }}.cfg
+  with_items: "{{ vyos_br }}"
+
+- name: Merge configuration via napalm_install_config
+  napalm_install_config:
+    hostname: "{{ inventory_hostname }}"
+    config_file: config_partial/vyos_br/vyos_br-{{ inventory_hostname }}.cfg
+    dev_os: vyos
+    commit_changes: True
+    provider: "{{ creds }}"
+
+- name: Commit and save changes
+  vyos_config:
+    save: yes
+    comment: "{{ task_comment }}"
+    provider: "{{ creds }}"
+
+- name: Commit Message
+  debug: msg="{{ task_comment }}"

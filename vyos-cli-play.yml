@@ -1,0 +1,27 @@
+---
+- hosts: vyos
+  gather_facts: yes
+  connection: local
+  ignore_errors: yes
+
+  tasks:
+  - name: obtain login credentials
+    include_vars: ../auth/secrets.yml
+
+  - name: define provider
+    set_fact:
+      provider:
+        host: "{{ inventory_hostname }}"
+        username: "{{ creds['username'] }}"
+        password: "{{ creds['password'] }}"
+
+  - name: obtain playbook variables
+    include_vars: vars/play_vars.yml
+
+  - name: Running task {{ task1 }}
+    include: tasks/vyos_config-{{ task1 }}.yml
+    when: task1 is defined
+
+  - name: Running task {{ task2 }}
+    include: tasks/vyos_config-{{ task2 }}.yml
+    when: task2 is defined

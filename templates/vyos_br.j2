@@ -1,0 +1,16 @@
+# Created by Ansible for {{ inventory_hostname }} on {{ ansible_date_time.date }}
+#
+set interfaces bridge br{{item.vyos_br_id}}
+set interfaces bridge br{{item.vyos_br_id}} stp true
+{% if item.vyos_l2_interface is defined %}
+set interfaces ethernet {{item.vyos_l2_interface}}
+set interfaces ethernet {{item.vyos_l2_interface}} vif {{item.vyos_br_id}} bridge-group bridge br{{item.vyos_br_id}}
+set interfaces ethernet {{item.vyos_l2_interface}} description {{ item.vyos_l2_interface_desc }}
+{% endif %}
+{% if item.vyos_br_ip is defined %}
+set interfaces bridge br{{item.vyos_br_id}} address {{item.vyos_br_ip}}
+set interfaces bridge br{{item.vyos_br_id}} description {{ item.vyos_l2_interface_desc }}.{{ item.vyos_br_ip_segment }}_segment
+set interfaces ethernet {{item.vyos_l2_interface}} vif {{item.vyos_br_id}} description {{ item.vyos_br_ip_segment }}_segment
+{% endif %}
+commit comment "Created by Ansible for {{ inventory_hostname }} to add br{{item.vyos_br_id}} Timestamp: {{ ansible_date_time.iso8601 }}"
+save

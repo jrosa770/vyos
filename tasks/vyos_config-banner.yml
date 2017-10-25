@@ -1,0 +1,29 @@
+- name: Backup Current Configuration for {{ inventory_hostname }} {{ ansible_date_time.iso8601 }}
+  vyos_config:
+    backup: yes
+    provider: "{{ creds }}"
+
+- name: remove the pre-login banner
+  vyos_banner:
+    banner: pre-login
+    state: absent
+    provider: "{{ creds }}"
+
+- name: Configure banner from file for "{{ inventory_hostname }}"
+  vyos_banner:
+    banner:  pre-login
+    text: "Device: {{ inventory_hostname }} {{ vyos_banner_text }}"
+    state: present
+    provider: "{{ creds }}"
+
+- name: Applied Banner
+  debug: msg="{{ lookup('file', './config_partial/pre-login_banner.cfg') }}"
+
+- name: Commit and save changes for "{{ inventory_hostname }}" Timestamp - "{{ ansible_date_time.iso8601 }}"
+  vyos_config:
+    save: yes
+    comment: "{{ task_comment }}"
+    provider: "{{ creds }}"
+
+- name: Commit Message
+  debug: msg="{{ task_comment }}"

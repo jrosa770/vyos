@@ -1,0 +1,35 @@
+- name: Backup Current Configuration for {{ inventory_hostname }} {{ ansible_date_time.iso8601 }}
+  vyos_config:
+    backup: yes
+    provider: "{{ creds }}"
+
+- name: Clear DNS and Hostname
+  vyos_system:
+    domain_search:
+    state: absent
+    provider: "{{ creds }}"
+
+- name: configure hostname and domain name {{ vyos_system_hostname }}.{{ vyos_system_domain_name }}
+  vyos_system:
+    host_name: "{{ vyos_system_hostname }}"
+    domain_name: "{{ vyos_system_domain_name }}"
+    state: present
+    provider: "{{ creds }}"
+
+- name: Configure DNS Servers for {{ inventory_hostname }}
+  vyos_system:
+    name_servers:
+      - "{{ name_server_1 }}"
+      - "{{ name_server_2 }}"
+      - "{{ name_server_3 }}"
+    state: present
+    provider: "{{ creds }}"
+
+- name: Commit and save changes for "{{ inventory_hostname }}" Timestamp - "{{ ansible_date_time.iso8601 }}"
+  vyos_config:
+    save: yes
+    comment: "{{ task_comment }}"
+    provider: "{{ creds }}"
+
+- name: Commit Message
+  debug: msg="{{ task_comment }}"

@@ -1,0 +1,14 @@
+# vyos_static Playbooks
+agg_vyos_static_w_clear: enabled
+agg_vyos_static_build: disabled
+#
+agg_vyos_static_prefix1: 192.168.3.0/24
+agg_vyos_static_nxt_hop1: 172.16.1.1
+agg_vyos_static_prefix2: 192.168.4.0/24
+agg_vyos_static_nxt_hop2: 172.16.2.1
+#
+agg_set_syntax_static: 
+  - "set protocols static route {{ agg_vyos_static_prefix1 }} next-hop {{ agg_vyos_static_nxt_hop1 }} <distance> <1-255>"
+  - "set protocols static route {{ agg_vyos_static_prefix1 }} next-hop {{ agg_vyos_static_nxt_hop1 }} <blackhole>"
+  - "set protocols static route {{ agg_vyos_static_prefix2 }} next-hop {{ agg_vyos_static_nxt_hop2 }} <distance> <1-255>"
+  - "set protocols static route {{ agg_vyos_static_prefix2 }} next-hop {{ agg_vyos_static_nxt_hop2 }} <blackhole>"

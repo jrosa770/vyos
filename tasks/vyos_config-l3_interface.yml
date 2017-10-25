@@ -1,0 +1,85 @@
+- name: Backup Current Configuration for {{ inventory_hostname }}
+  vyos_config:
+    backup: yes
+    provider: "{{ creds }}"
+
+# Single interface tasks
+- name: Clear interface {{ vyos_l3_interface_name }}
+  vyos_interface:
+    name: "{{ vyos_l3_interface_name }}"
+    state: absent
+    enabled: False
+    provider: "{{ creds }}"
+  when: (vyos_l3_interface_agg == 'disabled' and vyos_l3_interface_w_clear == 'enabled')
+
+- name: configure interface {{ vyos_l3_interface_name }}
+  vyos_interface:
+    name: "{{ vyos_l3_interface_name}}"
+    description: "{{ vyos_l3_interface_desc }}"
+    state: "{{ vyos_interface_state }}"
+    enabled: "{{ vyos_interface_enabled }}"
+    provider: "{{ creds }}"
+  when: (vyos_l3_interface_agg == 'disabled' and vyos_l3_interface_build == 'enabled')
+
+- name: configure interface {{ vyos_l3_interface_name }} with IP - {{ vyos_l3_interface_ipv4 }}
+  vyos_l3_interface:
+    name: "{{ vyos_l3_interface_name }}"
+    ipv4: "{{ vyos_l3_interface_ipv4 }}"
+    provider: "{{ creds }}"
+  when: (vyos_l3_interface_agg == 'disabled' and vyos_l3_interface_build == 'enabled' and vyos_l3_dual_stack == 'disabled')
+
+- name: configure interface {{ vyos_l3_interface_name }} with IP - {{ vyos_l3_interface_ipv4 }} and {{ vyos_l3_interface_ipv6 }}
+  vyos_l3_interface:
+    name: "{{ vyos_l3_interface_name }}"
+    ipv4: "{{ vyos_l3_interface_ipv4 }}"
+    ipv6: "{{ vyos_l3_interface_ipv6 }}"
+    provider: "{{ creds }}"
+  when: (vyos_l3_interface_agg == 'disabled' and vyos_l3_interface_build == 'enabled' and vyos_l3_dual_stack == 'enabled')
+
+# Aggregate tasks
+- name: Multiple interface Addition variables 
+  include_vars: vars/task_vars/vy_l3_int_aggregate.yml
+  when: vyos_l3_interface_agg == 'enabled'
+
+- name: Clear aggregate interfaces
+  vyos_interface:
+    aggregate:
+      - name: "{{ agg_vyos_l3_interface_name1 }}"
+      - name: "{{ agg_vyos_l3_interface_name2 }}"
+    state: absent
+    enabled: False
+    provider: "{{ creds }}"
+  when: (vyos_l3_interface_agg == 'enabled' and agg_vyos_l3_interface_w_clear == 'enabled')
+
+- name: Aggregate interface add
+  vyos_interface:
+    aggregate:
+      - { name: "{{ agg_vyos_l3_interface_name1 }}", description: "{{ agg_vyos_l3_interface_desc1 }}", state: "{{ vyos_interface_state }}", enabled: "{{ vyos_interface_enabled }}"}
+      - { name: "{{ agg_vyos_l3_interface_name2 }}", description: "{{ agg_vyos_l3_interface_desc2 }}", state: "{{ vyos_interface_state }}", enabled: "{{ vyos_interface_enabled }}"}
+    provider: "{{ creds }}"
+  when: (vyos_l3_interface_agg == 'enabled' and agg_vyos_l3_interface_build == 'enabled')
+
+- name: Aggregate interface add ipv4
+  vyos_l3_interface:
+    aggregate:
+      - { name: "{{ agg_vyos_l3_interface_name1 }}", ipv4: "{{ agg_vyos_l3_interface_ipv4_1 }}"}
+      - { name: "{{ agg_vyos_l3_interface_name2 }}", ipv4: "{{ agg_vyos_l3_interface_ipv4_2 }}"}
+    provider: "{{ creds }}"
+  when: (vyos_l3_interface_agg == 'enabled' and agg_vyos_l3_interface_build == 'enabled' and agg_vyos_l3_dual_stack == 'disabled')
+
+- name: Aggregate interface add ipv4 and ipv6
+  vyos_l3_interface:
+    aggregate:
+      - { name: "{{ agg_vyos_l3_interface_name1 }}", ipv4: "{{ agg_vyos_l3_interface_ipv4_1 }}", ipv6: "{{ agg_vyos_l3_interface_ipv6_1 }}"}
+      - { name: "{{ agg_vyos_l3_interface_name2 }}", ipv4: "{{ agg_vyos_l3_interface_ipv4_2 }}", ipv6: "{{ agg_vyos_l3_interface_ipv6_2 }}"}
+    provider: "{{ creds }}"
+  when: (vyos_l3_interface_agg == 'enabled' and agg_vyos_l3_interface_build == 'enabled' and agg_vyos_l3_dual_stack == 'enabled')
+
+- name: Commit and save changes
+  vyos_config:
+    save: yes
+    comment: "{{ vyos_l3_task_comment }}"
+    provider: "{{ creds }}"
+
+- name: Commit Message
+  debug: msg="{{ vyos_l3_task_comment }}"

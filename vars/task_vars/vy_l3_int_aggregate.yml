@@ -1,0 +1,15 @@
+# vyos_interface Playbooks
+agg_vyos_l3_interface_w_clear: enabled
+agg_vyos_l3_interface_build: disabled
+agg_vyos_l3_dual_stack: enabled
+#
+agg_vyos_l3_interface_name1: eth2
+agg_vyos_l3_interface_desc1: agg-test-interface-2
+agg_vyos_l3_interface_ipv4_1: 172.16.2.2/24
+agg_vyos_l3_interface_ipv6_1: dead:beef:ac10::2:2/64
+#
+agg_vyos_l3_interface_name2: eth3
+agg_vyos_l3_interface_desc2: agg-test-interface-3
+agg_vyos_l3_interface_ipv4_2: 172.16.3.2/24
+agg_vyos_l3_interface_ipv6_2: dead:beef:ac10::3:2/64
+

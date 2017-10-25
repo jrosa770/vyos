@@ -1,0 +1,8 @@
+# vyos_interface Playbooks
+agg_vyos_interface_w_clear: enabled
+agg_vyos_interface_build: disabled
+#
+agg_vyos_interface_name1: eth1
+agg_vyos_interface_desc1: agg-test-interface-1
+agg_vyos_interface_name2: eth3
+agg_vyos_interface_desc2: agg-test-interface-2

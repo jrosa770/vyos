@@ -1,0 +1,6 @@
+# vyos_system Playbooks
+vyos_system_hostname: lab.r2
+vyos_system_domain_name: net.example.net
+name_server_1: 8.8.8.8
+name_server_2: 208.67.222.222
+name_server_3: 208.67.220.220

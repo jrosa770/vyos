@@ -1,0 +1,24 @@
+# vyos_user Playbook
+vyos_user:
+  - {
+# vyos_user_conf: [add|change|delete]
+# Preference is for ssh key authentication but the playbook allows for 
+# password authentication if needed although it requires plaintext
+vyos_user_conf: add,
+# vyos_user_auth_type: [password|key]
+vyos_user_auth_type: key,
+vyos_user_name: theusername,
+vyos_user_password: thePassword,
+# For vyos_user_level: [admin|operator]
+vyos_user_level: operator,
+# Key identifier used by ssh-keygen (usually of form user@host)
+# Format of .ssh/<key_name>.pub: ssh-rsa <key_content> <username@host>
+# For "vyos_user_ssh_key_content:" value copy and paste the contents of .ssh/<key_name>.pub
+# in between ssh-rsa and username@host <key_content>
+vyos_user_ssh_key_type: ssh-rsa,
+vyos_user_ssh_key_user_id: username@host,
+# For "vyos_user_ssh_key_content:" value copy and paste the contents of .ssh/<key_name>.pub
+# in between ssh-rsa and username@host
+vyos_user_ssh_key_content: key_content
+}
+#

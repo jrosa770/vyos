@@ -1,0 +1,54 @@
+- name: Backup Current Configuration for {{ inventory_hostname }} {{ ansible_date_time.iso8601 }}
+  vyos_config:
+    backup: yes
+    provider: "{{ creds }}"
+
+# Single interface tasks
+- name: Clear interface {{ vyos_interface_name }}
+  vyos_interface:
+    name: "{{ vyos_interface_name }}"
+    state: absent
+    enabled: False
+    provider: "{{ creds }}"
+  when: (vyos_interface_agg == 'disabled' and vyos_interface_w_clear == 'enabled')
+
+- name: configure interface {{ vyos_interface_name }}
+  vyos_interface:
+    name: "{{ vyos_interface_name }}"
+    description: "{{ vyos_interface_desc }}"
+    state: "{{ vyos_interface_state }}"
+    enabled: "{{ vyos_interface_enabled }}"
+    provider: "{{ creds }}"
+  when: (vyos_interface_agg == 'disabled' and vyos_interface_build == 'enabled')
+
+# Aggregate tasks
+- name: Multiple interface Addition variables 
+  include_vars: vars/task_vars/vy_int_aggregate.yml
+  when: vyos_interface_agg == 'enabled'
+
+- name: Aggregate interface clear
+  vyos_interface:
+    aggregate:
+      - { name: "{{ agg_vyos_interface_name1 }}", description: "{{ agg_vyos_interface_desc1 }}"}
+      - { name: "{{ agg_vyos_interface_name2 }}", description: "{{ agg_vyos_interface_desc2 }}"}
+    state: absent
+    enabled: False
+    provider: "{{ creds }}"
+  when: (vyos_interface_agg == 'enabled' and agg_vyos_interface_w_clear == 'enabled')
+
+- name: Aggregate interface add
+  vyos_interface:
+    aggregate:
+      - { name: "{{ agg_vyos_interface_name1 }}", description: "{{ agg_vyos_interface_desc1 }}", state: "{{ vyos_interface_state }}", enabled: "{{ vyos_interface_enabled }}"}
+      - { name: "{{ agg_vyos_interface_name2 }}", description: "{{ agg_vyos_interface_desc2 }}", state: "{{ vyos_interface_state }}", enabled: "{{ vyos_interface_enabled }}"}
+    provider: "{{ creds }}"
+  when: (vyos_interface_agg == 'enabled' and agg_vyos_interface_build == 'enabled')
+
+- name: Commit and save changes for "{{ inventory_hostname }}" Timestamp - "{{ ansible_date_time.iso8601 }}"
+  vyos_config:
+    save: yes
+    comment: "{{ task_comment }}"
+    provider: "{{ creds }}"
+
+- name: Commit Message
+  debug: msg="{{ task_comment }}"

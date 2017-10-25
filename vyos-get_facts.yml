@@ -1,0 +1,43 @@
+---
+- hosts: vyos
+  gather_facts: no
+  connection: local
+
+  tasks:
+  - name: obtain login credentials
+    include_vars: ../auth/secrets.yml
+
+  - name: define provider
+    set_fact:
+      provider:
+        host: "{{ inventory_hostname }}"
+        username: "{{ creds['username'] }}"
+        password: "{{ creds['password'] }}"
+
+  - name: Gather Facts
+    vyos_facts:
+      gather_subset: all
+      provider: "{{ creds }}"
+    register: vyos
+
+  - name: version
+    debug: msg="{{ vyos.ansible_facts.ansible_net_version }}"
+
+  - name: Gather Facts
+    vyos_facts:
+      gather_subset: all
+      provider: "{{ creds }}"
+    register: vyos_response
+
+  - name: Fact {{ inventory_hostname }} configuration
+    debug: 
+      msg="{{ vyos_response.ansible_facts.ansible_net_config }}"
+
+  - name: Save Fact {{ inventory_hostname }} configuration to file
+    copy: 
+      content: "{{ vyos_response.ansible_facts.ansible_net_config }}"
+      dest: facts/{{ inventory_hostname }}.cfg
+      mode: 0664
+  
+  - name: format file
+    shell: sed 's/\\n/\n/g' 'facts/{{ inventory_hostname }}.cfg' > 'facts/{{ inventory_hostname }}-set.cfg'

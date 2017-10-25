@@ -1,0 +1,14 @@
+# vyos_lacp_bonding Playbook
+vyos_bond:
+  - {
+# vyos_bond_conf: [add|change|delete]
+# If add the task adds a new LACP bond interface
+# If change it will only add the interface(s) to the bond in vyos_bond_name: bond[number] (if available)
+# If delete it will take out the interfaces out of the bond ad delee the bond LACP interface
+vyos_bond_conf: add,
+vyos_bond_name: bond1200,
+vyos_bond_if1: eth2,
+vyos_bond_if2: eth3,
+vyos_bond_description: "PROV",
+}
+#

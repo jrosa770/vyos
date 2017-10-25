@@ -1,0 +1,162 @@
+---
+# Change Control Information. In not applicable type n_a
+cc_info: CHG123456
+# Assign Task Type
+# Options for Task: 
+# | banner | system | user | interface | l3_interface | br | basic_ebgp | basic_ibgp |
+# | static_rt | ntp | bond |
+task1: system
+#task2: banner
+#
+task_comment: config_commit-{{ cc_info }}_{{ inventory_hostname }}_{{ ansible_date_time.iso8601 }}
+#
+# Banner Playbook
+vyos_banner_text: "{{ lookup('file', './config_partial/pre-login_banner.cfg') }}"
+# vyos_system Playbook
+vyos_system_hostname: lab.r2
+vyos_system_domain_name: net.example.net
+name_server_1: 8.8.8.8
+name_server_2: 208.67.222.222
+name_server_3: 8.8.4.4
+#
+# vyos_user Playbook
+# vyos_user Playbook
+vyos_user:
+  - {
+# vyos_user_conf: [add|change|delete]
+# Preference is for ssh key authentication but the playbook allows for 
+# password authentication if needed although it requires plaintext
+vyos_user_conf: add,
+# vyos_user_auth_type: [password|key]
+vyos_user_auth_type: key,
+vyos_user_name: theusername,
+vyos_user_password: thePassword,
+# For vyos_user_level: [admin|operator]
+vyos_user_level: operator,
+# Key identifier used by ssh-keygen (usually of form user@host)
+# Format of .ssh/<key_name>.pub: ssh-rsa <key_content> <username@host>
+# For "vyos_user_ssh_key_content:" value copy and paste the contents of .ssh/<key_name>.pub
+# in between ssh-rsa and username@host <key_content>
+vyos_user_ssh_key_type: ssh-rsa,
+vyos_user_ssh_key_user_id: username@host,
+# For "vyos_user_ssh_key_content:" value copy and paste the contents of .ssh/<key_name>.pub
+# in between ssh-rsa and username@host
+vyos_user_ssh_key_content: key_content
+}
+#
+# vyos_interface Playbooks
+# If vyos_interface_build = enabled, the interface playbook will configure the interface
+# If vyos_interface_build = disabled, the playbook will just clear then interface configuration
+vyos_interface_build: enabled
+#
+vyos_interface_name: eth1
+vyos_interface_desc: test-interface
+vyos_interface_state: present
+vyos_interface_enabled: True
+# Disable interface configuration option
+vyos_interface_w_clear: enabled
+# Option for vyos_interface aggregate
+# Playbook will call vars/task_vars/vy_int_aggregate.yml for information
+vyos_interface_agg: enabled
+#
+# vyos_l3_interface Playbooks
+# If vyos_interface_build = enabled, the interface playbook will configure the interface and the IP address
+# If vyos_interface_build = disabled, the playbook will just clear then IP interface configuration
+vyos_l3_interface_build: enabled
+#
+vyos_l3_dual_stack: disabled
+vyos_l3_interface_desc: l3-test-1
+vyos_l3_interface_name: br200
+vyos_l3_interface_ipv4: 172.16.1.2/30
+vyos_l3_interface_ipv6: dead:beef:ac10::1:2/64
+# Disable l3_interface configuration option
+vyos_l3_interface_w_clear: enabled
+# Option for vyos_l3_interface aggregate
+# Playbook will call vars/task_vars/vy_l3_int_aggregate.yml for information
+vyos_l3_interface_agg: disabled
+#
+vyos_l3_task_comment: config_save-{{ cc_info }}_{{ inventory_hostname }}-{{ vyos_l3_interface_desc }}_{{ vyos_l3_interface_name }}
+#
+# vyos_br Playbooks
+vyos_br:
+  - {
+vyos_br_id: 2,
+vyos_l2_interface: eth2,
+vyos_l2_interface_desc: L2_Interface,
+vyos_br_ip: 172.16.2.2/24,
+vyos_br_ip_segment: 172.16.2.0/24
+}
+#
+# vyos_lacp_bonding Playbook
+vyos_bond:
+  - {
+# vyos_bond_conf: [add|change|delete]
+# If add the task adds a new LACP bond interface
+# If change it will only add the interface(s) to the bond in vyos_bond_name: bond[number] (if available)
+# If delete it will take out the interfaces out of the bond ad delee the bond LACP interface
+vyos_bond_conf: add,
+vyos_bond_name: bond1200,
+vyos_bond_if1: eth2,
+vyos_bond_if2: eth3,
+vyos_bond_description: "PROV",
+}
+#
+# vyos_local_bgp
+local_bgp:
+  - {
+bgp_local_as: 65000,
+bgp_local_adv_prefix1: 172.16.0.0/24,
+bgp_local_parameters_rtr_id: 172.16.0.2
+}
+# vyos basic_ebgp Playbook
+# For interface build the "tasks" variables require:
+# task1: l3_interface
+# task2: basic_ebgp
+# To push just a peering:
+# task1: basic_ebgp
+# #task2: <empty or commented (undefined)>
+basic_ebgp:
+  - {
+bgp_local_as: 65172,
+ebgp_group_name: EBGP_PROV2_GROUP,
+ebgp_peer_description: "EBGP_PROV2_PEERS_VIA-{{ vyos_l3_interface_name }}",
+ebgp_peer_asn: 65100,
+ebgp_peering_ip: 172.16.200.1,
+ebgp_peering_passwd: "Go!Figur3",
+ebgp_initial_passive: enabled
+}
+#
+# basic_ibgp Playbook
+# basic_ibgp Playbook
+basic_ibgp:
+  - {
+bgp_local_as: 65000,
+ibgp_group_name: IBGP_PROV2_GROUP,
+ibgp_peer_description: IBGP_PROV2_PEERS,
+# Update source IP for iBGP Peering
+ibgp_local_ip: 172.16.2.2,
+ibgp_peering_ip: 172.16.2.1,
+#bgp_peering_passwd: "Boy!NamedSu3",
+ibgp_initial_state: enabled
+}
+# vyos static route Playbook
+# If vyos_interface_build = enabled, the interface playbook will configure static route
+# If vyos_interface_build = disabled, the playbook will just clear the ip route
+vyos_static_route_build: enabled
+#
+# Delete the existing static configuration to the same destination before configuration option
+vyos_static_route_w_clear: enabled
+#
+# If Default ***(Use with Care)***
+vyos_static_default: disabled
+# Specific prefix (destination)
+vyos_static_route_dest: 192.168.0.0/25
+# Next Hop for specific or default 
+vyos_static_route_nxt_hop: 172.16.1.1
+# Set Command:
+set_syntax_static: 
+  - "set protocols static route {{ vyos_static_route_dest }} next-hop {{ vyos_static_route_nxt_hop }} <distance> <1-255>"
+  - "set protocols static route {{ vyos_static_route_dest }} next-hop {{ vyos_static_route_nxt_hop }} <blackhole>"
+# Option for vyos_l3_interface aggregate
+# Playbook will call vars/task_vars/vy_static_aggregate.yml for information
+vyos_static_route_agg: disabled

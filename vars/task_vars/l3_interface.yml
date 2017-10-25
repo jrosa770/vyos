@@ -1,0 +1,16 @@
+# vyos_l3_interface Playbooks
+# If vyos_interface_build = enabled, the interface playbook will configure the interface and the IP address
+# If vyos_interface_build = disabled, the playbook will just clear then IP interface configuration
+vyos_l3_interface_build: enabled
+#
+vyos_l3_dual_stack: disabled
+vyos_l3_interface_desc: l3-test-1
+vyos_l3_interface_name: eth1
+vyos_l3_interface_ipv4: 172.16.1.2/30
+vyos_l3_interface_ipv6: dead:beef:ac10::1:2/64
+# Disable l3_interface configuration option
+vyos_l3_interface_w_clear: enabled
+# Option for vyos_l3_interface aggregate
+# Playbook will call vars/task_vars/vy_l3_int_aggregate.yml for information
+vyos_l3_interface_agg: disabled
+#

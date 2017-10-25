@@ -1,0 +1,15 @@
+# vyos_interface Playbooks
+# If vyos_interface_build = enabled, the interface playbook will configure the interface
+# If vyos_interface_build = disabled, the playbook will just clear then interface configuration
+vyos_interface_build: enabled
+#
+vyos_interface_name: eth1
+vyos_interface_desc: test-interface
+vyos_interface_state: present
+vyos_interface_enabled: True
+# Disable interface configuration option
+vyos_interface_w_clear: enabled
+# Option for vyos_interface aggregate
+# Playbook will call vars/task_vars/vy_int_aggregate.yml for information
+vyos_interface_agg: enabled
+#

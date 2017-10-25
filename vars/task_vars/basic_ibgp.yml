@@ -1,0 +1,12 @@
+# basic_ibgp Playbook
+basic_ibgp:
+  - {
+bgp_local_as: 65000,
+ibgp_group_name: IBGP_TEST_GROUP,
+ibgp_peer_description: IBGP_TEST_PEERS,
+# Update source IP for iBGP Peering
+ibgp_local_ip: 172.16.2.2,
+ibgp_peering_ip: 172.16.2.1,
+#ibgp_peering_passwd: "Boy!NamedSu3",
+ibgp_initial_state: enabled
+}
