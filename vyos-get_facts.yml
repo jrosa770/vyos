@@ -1,6 +1,6 @@
 ---
 - hosts: vyos
-  gather_facts: no
+  gather_facts: yes
   connection: local
 
   tasks:

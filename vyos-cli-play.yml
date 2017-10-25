@@ -6,7 +6,7 @@
 
   tasks:
   - name: obtain login credentials
-    include_vars: ../auth/secrets.yml
+    include_vars: auth/secrets.yml
 
   - name: define provider
     set_fact:
@@ -17,6 +17,24 @@
 
   - name: obtain playbook variables
     include_vars: vars/play_vars.yml
+  
+  # Or before tasks:
+  # - vars:
+  #     task1: system
+  #     task2: banner
+  #
+  # tasks:
+  # - name: obtain login credentials
+  # ...
+  #
+  # Then replace the "Running" tasks:
+  # - name: Running task {{ task1 }}
+  #   include: tasks/task_vars/vyos_config-{{ task1 }}.yml
+  #   when: task1 is defined
+  #
+  # - name: Running task {{ task2 }}
+  #   include: tasks/task_vars/vyos_config-{{ task2 }}.yml
+  #   when: task2 is defined
 
   - name: Running task {{ task1 }}
     include: tasks/vyos_config-{{ task1 }}.yml
