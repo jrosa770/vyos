@@ -6,7 +6,7 @@
 
 * Run multiple tasks out of one playbook
 * Control of playbook functions via one common vars file
-* Quick runs of routine tasks on Junos based devices
+* Quick runs of routine tasks on VyOS based devices
 * Control of task via variable task: in play_vars.yml. Example: task: banner will activate vyos_config-banner.yml. Separate vars files are avialble if needed in ```vars\task_bars```.
 * The playbook is set to run up to 2 tasks but it can be expanded if needed.
 
