@@ -1,0 +1,4 @@
+---
+creds:
+ username: ansible
+ ssh_keyfile: /home/ansible/.ssh/id_rsa_ansible

@@ -19,3 +19,18 @@ The playbook uses the file secrets.yml, but it can be named anything else, keep 
 ```
 
 Remember to encrypt your authentication file with ```ansible-vault```.
+
+## For SSH Key Authentication
+
+```yml
+---
+creds:
+ username: ansible
+ ssh_keyfile: /home/ansible/.ssh/id_rsa_ansible
+```
+
+```yml
+  tasks:
+  - name: obtain login credentials
+    include_vars: ../auth/user.yml
+```

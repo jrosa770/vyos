@@ -1,0 +1,50 @@
+---
+- hosts: lab.vyos.r1
+  gather_facts: yes
+  connection: local
+  ignore_errors: yes
+
+  tasks:
+  - name: Load {{ inventory_hostname }} vars file
+    include_vars: ../vars/host_vars/{{ inventory_hostname }}.yml
+
+  - name: obtain login credentials
+    include_vars: ../auth/secrets.yml
+
+  - name: define provider
+    set_fact:
+      provider:
+        host: "{{ inventory_hostname }}"
+        username: "{{ creds['username'] }}"
+        password: "{{ creds['password'] }}"
+
+# If User and ssh key file is used:
+#  - name: obtain login credentials
+#    include_vars: ../auth/user.yml
+#
+#  - name: define authentication provider
+#    set_fact:
+#      provider:
+#        host: "{{ inventory_hostname }}"
+#        username: "{{ creds['username'] }}"
+#        ssh_keyfile: "{{ creds['ssh_keyfile'] }}"
+
+  - name: Gather Facts
+    vyos_facts:
+      gather_subset: all
+      provider: "{{ creds }}"
+    register: vyos_response
+
+  - name: version
+    debug: msg="{{ vyos_response.ansible_facts.ansible_net_version }}"
+
+  - name: Load Cymru Bogons Configuration for {{device_name}} {{ ansible_date_time.iso8601 }}
+    vyos_config:
+      backup: yes
+      src: vyos_cymru_bogons.cfg
+      save: yes
+      comment:  Load Cymru Bogons Configuration for "{{device_name}}" on "{{ ansible_date_time.iso8601 }}" via Ansible VyOs_Config
+      provider: "{{ creds }}"
+    with_items: "{{ cymru_bogons }}"
+    when: cymru_bogons is defined
+  #  delegate_to: "{{ ansible_proxies['proxy_test'] }}"

@@ -1,0 +1,10 @@
+cymru_bogons:
+  - local_as: 65000
+    cymru_as: 65332
+    cymru_community_list: 332
+    cymru_peer_v4: '38.229.66.20'
+    cymru_peer_v6: '2620:0:6B0::26E5:4207'
+    update_source_int: 'eth1'
+    update_source_ipv4: '1.1.142.2'
+    update_source_ipv6: 'fd01:dead:beef:1::2'
+    peering_passwd: 'CymRUB0G0n5'
