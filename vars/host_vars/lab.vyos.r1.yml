@@ -1,3 +1,4 @@
+device_name: lab.vyos.r1
 cymru_bogons:
   - local_as: 65000
     cymru_as: 65332
