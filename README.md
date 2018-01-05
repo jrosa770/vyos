@@ -14,6 +14,10 @@
 ```tree
 ├── archive
 │   └── empty.txt
+├── auth
+│   ├── README.md
+│   ├── secrets.yml
+│   └── user.yml
 ├── backup
 │   └── empty.txt
 ├── bin
@@ -31,6 +35,10 @@
 │   │   └── empty.txt
 │   └── vyos_user
 │       └── empty.txt
+├── cymru_bogons
+│   ├── README.md
+│   ├── vyos_cymru_bogons.cfg
+│   └── vyos_cymru_bogons.yml
 ├── diffs
 │   └── empty.txt
 ├── play_results
@@ -59,6 +67,8 @@
 │   ├── vyos_br.j2
 │   └── vyos_user.j2
 ├── vars
+│   ├── host_vars
+│   │   └── lab.vyos.r1.yml
 │   ├── play_vars.yml
 │   └── task_vars
 │       ├── banner.yml
